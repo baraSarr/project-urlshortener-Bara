@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const dns = require('dns');
 const bodyParser = require('body-parser');
 const app = express();
 
@@ -25,9 +26,16 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', function(req, res) {
   urlToShorten = req.body['url'];
-  urlsShortened.push(urlToShorten);
-  urlShortened = urlsShortened.length;
-  res.json({original_url: urlToShorten, short_url: urlShortened});
+  dns.lookup(urlToShorten, function(error, address, family) {
+    if(error)
+      res.json({error: "invalide url"});
+    else {
+      urlsShortened.push(urlToShorten);
+      urlShortened = urlsShortened.length;
+      res.json({original_url: urlToShorten, short_url: urlShortened});
+    }
+  });
+  
 });
 
 app.get('/api/shorturl/:url', function(req, res) {
