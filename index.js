@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
 
 // Basic Configuration
@@ -9,6 +10,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
+app.use(bodyParser.urlencoded({extended: false}));
+
+let urlsShortened = [];
 
 app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
@@ -18,6 +22,19 @@ app.get('/', function(req, res) {
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
+
+app.post('/api/shorturl', function(req, res) {
+  urlToShorten = req.body['url'];
+  urlsShortened.push(urlToShorten);
+  urlShortened = urlsShortened.length - 1;
+  res.json({original_url: urlToShorten, short_url: urlShortened});
+});
+
+app.get('/api/shorturl/:url', function(req, res) {
+  shortUrl = parseInt(req.params.url);
+  destinationUrl = urlsShortened[shortUrl];
+  res.redirect(destinationUrl);
+})
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
