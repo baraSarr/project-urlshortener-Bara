@@ -26,13 +26,13 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl', function(req, res) {
   urlToShorten = req.body['url'];
   urlsShortened.push(urlToShorten);
-  urlShortened = urlsShortened.length - 1;
+  urlShortened = urlsShortened.length;
   res.json({original_url: urlToShorten, short_url: urlShortened});
 });
 
 app.get('/api/shorturl/:url', function(req, res) {
   shortUrl = parseInt(req.params.url);
-  destinationUrl = urlsShortened[shortUrl];
+  destinationUrl = urlsShortened[shortUrl-1];
   res.redirect(destinationUrl);
 })
 
